@@ -7,7 +7,7 @@ The project follows the **MVVM (Model-View-ViewModel)** architecture pattern.
 
 ---
 ## 🚀 Features
-- Email-based login (no password required)
+- Email-based login 
 - Create, read, update, and delete tasks
 - Mark tasks as complete or pending
 - Clean MVVM architecture
