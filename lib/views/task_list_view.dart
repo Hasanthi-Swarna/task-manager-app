@@ -6,21 +6,21 @@ import 'login_view.dart';
 import 'dart:math';
 
 class TaskListView extends StatelessWidget {
-  final String email;
-  const TaskListView({required this.email});
+  final String userName;
+  const TaskListView({required this.userName});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => TaskViewModel(),
-      child: TaskListScreen(email: email),
+      child: TaskListScreen(userName: userName),
     );
   }
 }
 
 class TaskListScreen extends StatelessWidget {
-  final String email;
-  const TaskListScreen({required this.email});
+  final String userName;
+  const TaskListScreen({required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +105,7 @@ class TaskListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome, $email'),
+        title: Text('Welcome, $userName'),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
