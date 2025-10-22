@@ -10,6 +10,8 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  bool _isPasswordVisible = false;
+
   bool isValidEmail(String email) {
     final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return regex.hasMatch(email);
@@ -17,10 +19,13 @@ class _LoginViewState extends State<LoginView> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
+      final String email = _emailController.text;
+      final String userName = email.split('@')[0];
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => TaskListView(email: _emailController.text),
+          builder: (context) => TaskListView(userName: userName),
         ),
       );
     }
@@ -39,7 +44,10 @@ class _LoginViewState extends State<LoginView> {
             children: [
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Enter your email'),
+                decoration: const InputDecoration(
+                  labelText: 'Enter your email',
+                  border: InputBorder.none,
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter email';
@@ -49,12 +57,42 @@ class _LoginViewState extends State<LoginView> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
-              ElevatedButton(onPressed: _login, child: Text('Login')),
+              TextFormField(
+                obscureText: !_isPasswordVisible,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  border: InputBorder.none,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+              ),
+              ElevatedButton(onPressed: _login, child: const Text('Login')),
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
   }
 }
