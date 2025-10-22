@@ -1,0 +1,22 @@
+import '../models/task_model.dart';
+
+class TaskRepository {
+  final List<Task> _tasks = [];
+
+  List<Task> getTasks() => _tasks;
+
+  void addTask(Task task) {
+    _tasks.add(task);
+  }
+
+  void updateTask(Task updatedTask) {
+    final index = _tasks.indexWhere((t) => t.id == updatedTask.id);
+    if (index != -1) {
+      _tasks[index] = updatedTask;
+    }
+  }
+
+  void deleteTask(String id) {
+    _tasks.removeWhere((t) => t.id == id);
+  }
+}
