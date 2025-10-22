@@ -46,7 +46,6 @@ class _LoginViewState extends State<LoginView> {
                 controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Enter your email',
-                  border: InputBorder.none,
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -61,7 +60,6 @@ class _LoginViewState extends State<LoginView> {
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  border: InputBorder.none,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible
