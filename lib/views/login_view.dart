@@ -62,7 +62,6 @@ class _LoginViewState extends State<LoginView> {
           key: _formKey,
           child: Center(
             child: Column(
-              // crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
@@ -72,9 +71,7 @@ class _LoginViewState extends State<LoginView> {
                     decoration: InputDecoration(
                       labelText: 'Enter your email',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          15.0,
-                        ), // Rounded corners
+                        borderRadius: BorderRadius.circular(15.0),
                       ),
                     ),
                     validator: (value) {
@@ -87,7 +84,7 @@ class _LoginViewState extends State<LoginView> {
                     },
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: 300,
                   child: TextFormField(
@@ -95,9 +92,7 @@ class _LoginViewState extends State<LoginView> {
                     decoration: InputDecoration(
                       labelText: 'Password',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          15.0,
-                        ), // Rounded corners
+                        borderRadius: BorderRadius.circular(15.0),
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -120,14 +115,12 @@ class _LoginViewState extends State<LoginView> {
                     },
                   ),
                 ),
-                SizedBox(height: 30), // Add space before the button
+                const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: _login,
                   child: const Text(
                     'Login',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],

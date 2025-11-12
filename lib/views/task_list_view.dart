@@ -23,38 +23,37 @@ class TaskListScreen extends StatelessWidget {
   final String userName;
   const TaskListScreen({required this.userName, super.key});
 
-  // The helper function is now defined outside of build
   void _showAddOrEditTaskDialog({
-    required BuildContext context, // Added context
-    required TaskViewModel viewModel, // Added viewModel
+    required BuildContext context,
+    required TaskViewModel viewModel,
     Task? task,
   }) {
     final titleController = TextEditingController(text: task?.title ?? '');
-    final descController = TextEditingController(text: task?.description ?? '');
+    final descController = TextEditingController(
+      text: task?.description ?? '',
+    );
     DateTime? selectedDate =
         task?.dueDate ?? DateTime.now().add(const Duration(days: 1));
 
     showDialog(
       context: context,
-      // Use a StatefulBuilder to allow the dialog content to update its state
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setState) {
-            // Function to pick the date and update the dialog's state
             Future<void> pickDate() async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: selectedDate!,
-                firstDate: DateTime.now(),
-                lastDate: DateTime(2100),
-              );
-              if (picked != null) {
-                // Use setState from StatefulBuilder to redraw the dialog content
-                setState(() {
-                  selectedDate = picked;
-                });
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: selectedDate!,
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(2100),
+                );
+                if (picked != null) {
+                  // Use setState from StatefulBuilder to redraw the dialog content
+                  setState(() {
+                    selectedDate = picked;
+                  });
+                }
               }
-            }
 
             return AlertDialog(
               title: Text(task == null ? 'Add Task' : 'Edit Task'),
@@ -67,7 +66,9 @@ class TaskListScreen extends StatelessWidget {
                   ),
                   TextField(
                     controller: descController,
-                    decoration: const InputDecoration(labelText: 'Description'),
+                    decoration: const InputDecoration(
+                      labelText: 'Description',
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -119,7 +120,6 @@ class TaskListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Correctly accessing the ViewModel using Provider
     final viewModel = Provider.of<TaskViewModel>(context);
 
     return Scaffold(
@@ -134,7 +134,9 @@ class TaskListScreen extends StatelessWidget {
                   themeProvider.toggleTheme();
                 },
                 icon: Icon(
-                  themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  themeProvider.isDarkMode
+                      ? Icons.light_mode
+                      : Icons.dark_mode,
                 ),
               );
             },
@@ -178,7 +180,10 @@ class TaskListScreen extends StatelessWidget {
                         Text(
                           'Deadline: ${task.dueDate.toLocal().toString().split(' ')[0]}',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                             fontSize: 12,
                           ),
                         ),
@@ -214,8 +219,10 @@ class TaskListScreen extends StatelessWidget {
               },
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            _showAddOrEditTaskDialog(context: context, viewModel: viewModel),
+        onPressed: () => _showAddOrEditTaskDialog(
+          context: context,
+          viewModel: viewModel,
+        ),
         child: const Icon(Icons.add),
       ),
     );
