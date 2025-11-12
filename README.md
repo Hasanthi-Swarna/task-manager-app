@@ -6,7 +6,21 @@ It allows users to log in with an email, add, edit, delete, and mark tasks as co
 The project follows the **MVVM (Model-View-ViewModel)** architecture pattern.  
 
 ---
+## 🚀 Features
+- Email-based login (no password required)
+- Create, read, update, and delete tasks
+- Mark tasks as complete or pending
+- Clean MVVM architecture
+- State management with Provider
+- Simple, user-friendly UI
 
+---
+## 🛠️ Technology Stack
+- Flutter 3.x
+- Provider for state management
+- Dart for business logic
+
+---
 ## 📂 File Structure
 lib/
 │

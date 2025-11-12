@@ -2,113 +2,145 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/task_model.dart';
 import '../viewmodels/task_viewmodel.dart';
+import '../providers/theme_provider.dart';
 import 'login_view.dart';
 import 'dart:math';
 
 class TaskListView extends StatelessWidget {
-  final String email;
-  const TaskListView({required this.email});
+  final String userName;
+  const TaskListView({required this.userName, super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => TaskViewModel(),
-      child: TaskListScreen(email: email),
+      child: TaskListScreen(userName: userName),
     );
   }
 }
 
 class TaskListScreen extends StatelessWidget {
-  final String email;
-  const TaskListScreen({required this.email});
+  final String userName;
+  const TaskListScreen({required this.userName, super.key});
+
+  // The helper function is now defined outside of build
+  void _showAddOrEditTaskDialog({
+    required BuildContext context, // Added context
+    required TaskViewModel viewModel, // Added viewModel
+    Task? task,
+  }) {
+    final titleController = TextEditingController(text: task?.title ?? '');
+    final descController = TextEditingController(text: task?.description ?? '');
+    DateTime? selectedDate =
+        task?.dueDate ?? DateTime.now().add(const Duration(days: 1));
+
+    showDialog(
+      context: context,
+      // Use a StatefulBuilder to allow the dialog content to update its state
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            // Function to pick the date and update the dialog's state
+            Future<void> pickDate() async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: selectedDate!,
+                firstDate: DateTime.now(),
+                lastDate: DateTime(2100),
+              );
+              if (picked != null) {
+                // Use setState from StatefulBuilder to redraw the dialog content
+                setState(() {
+                  selectedDate = picked;
+                });
+              }
+            }
+
+            return AlertDialog(
+              title: Text(task == null ? 'Add Task' : 'Edit Task'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(labelText: 'Title'),
+                  ),
+                  TextField(
+                    controller: descController,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Deadline: ${selectedDate!.toLocal().toString().split(' ')[0]}',
+                      ),
+                      TextButton(
+                        onPressed: pickDate,
+                        child: const Text('Pick Date'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (titleController.text.isNotEmpty) {
+                      final newTask = Task(
+                        id: task?.id ?? Random().nextInt(10000).toString(),
+                        title: titleController.text,
+                        description: descController.text,
+                        dueDate: selectedDate!,
+                        isCompleted: task?.isCompleted ?? false,
+                      );
+                      if (task == null) {
+                        viewModel.addTask(newTask);
+                      } else {
+                        viewModel.updateTask(newTask);
+                      }
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text(task == null ? 'Add' : 'Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Correctly accessing the ViewModel using Provider
     final viewModel = Provider.of<TaskViewModel>(context);
-
-    void _showAddOrEditTaskDialog({Task? task}) {
-      final titleController = TextEditingController(text: task?.title ?? '');
-      final descController = TextEditingController(
-        text: task?.description ?? '',
-      );
-      DateTime? selectedDate =
-          task?.dueDate ?? DateTime.now().add(Duration(days: 1));
-
-      Future<void> _pickDate() async {
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: selectedDate!,
-          firstDate: DateTime.now(),
-          lastDate: DateTime(2100),
-        );
-        if (picked != null) selectedDate = picked;
-      }
-
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(task == null ? 'Add Task' : 'Edit Task'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: InputDecoration(labelText: 'Title'),
-                ),
-                TextField(
-                  controller: descController,
-                  decoration: InputDecoration(labelText: 'Description'),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Deadline: ${selectedDate!.toLocal().toString().split(' ')[0]}',
-                    ),
-                    TextButton(onPressed: _pickDate, child: Text('Pick Date')),
-                  ],
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (titleController.text.isNotEmpty) {
-                    final newTask = Task(
-                      id: task?.id ?? Random().nextInt(10000).toString(),
-                      title: titleController.text,
-                      description: descController.text,
-                      dueDate: selectedDate!,
-                      isCompleted: task?.isCompleted ?? false,
-                    );
-                    if (task == null) {
-                      viewModel.addTask(newTask);
-                    } else {
-                      viewModel.updateTask(newTask);
-                    }
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(task == null ? 'Add' : 'Save'),
-              ),
-            ],
-          );
-        },
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome, $email'),
+        title: Text('Welcome, $userName'),
+        centerTitle: true,
         actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return IconButton(
+                onPressed: () {
+                  themeProvider.toggleTheme();
+                },
+                icon: Icon(
+                  themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                ),
+              );
+            },
+          ),
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               Navigator.pushReplacement(
                 context,
@@ -119,13 +151,16 @@ class TaskListScreen extends StatelessWidget {
         ],
       ),
       body: viewModel.tasks.isEmpty
-          ? Center(child: Text('No tasks yet.'))
+          ? const Center(child: Text('Make yourself busy!'))
           : ListView.builder(
               itemCount: viewModel.tasks.length,
               itemBuilder: (context, index) {
                 final task = viewModel.tasks[index];
                 return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   child: ListTile(
                     title: Text(
                       task.title,
@@ -139,11 +174,11 @@ class TaskListScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(task.description),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           'Deadline: ${task.dueDate.toLocal().toString().split(' ')[0]}',
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 12,
                           ),
                         ),
@@ -153,22 +188,23 @@ class TaskListScreen extends StatelessWidget {
                       spacing: 4,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => _showAddOrEditTaskDialog(task: task),
+                          icon: Icon(Icons.edit),
+                          onPressed: () => _showAddOrEditTaskDialog(
+                            context: context,
+                            viewModel: viewModel,
+                            task: task,
+                          ),
                         ),
                         IconButton(
                           icon: Icon(
                             task.isCompleted
                                 ? Icons.check_circle
                                 : Icons.circle_outlined,
-                            color: task.isCompleted
-                                ? Colors.green
-                                : Colors.grey,
                           ),
                           onPressed: () => viewModel.toggleComplete(task.id),
                         ),
                         IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: Icon(Icons.delete),
                           onPressed: () => viewModel.deleteTask(task.id),
                         ),
                       ],
@@ -178,8 +214,9 @@ class TaskListScreen extends StatelessWidget {
               },
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddOrEditTaskDialog(),
-        child: Icon(Icons.add),
+        onPressed: () =>
+            _showAddOrEditTaskDialog(context: context, viewModel: viewModel),
+        child: const Icon(Icons.add),
       ),
     );
   }
