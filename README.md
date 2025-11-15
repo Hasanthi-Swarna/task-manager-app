@@ -7,7 +7,7 @@ The project follows the **MVVM (Model-View-ViewModel)** architecture pattern.
 
 ---
 ## 🚀 Features  
-- 🔐 **Email-based Login** (no password required)  
+- 🔐 **Email-based Login**  
 - 📝 **Add, Edit, Delete Tasks**  
 - ✅ **Mark Tasks as Complete or Pending**  
 - 🌗 **Supports Light & Dark Themes**  
@@ -30,7 +30,9 @@ lib/
 |   ├── login_view.dart     # Login screen
 |    └── task_list_view.dart # Task management screen
 └── theme/
-    └── theme.dart # Theme data
+|   └── theme.dart # Theme data
+└── provider/
+    └── themeprovider.dart # Theme Provider data
 
 ```
 
